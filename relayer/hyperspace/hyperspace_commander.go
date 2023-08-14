@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"path"
 
+	"github.com/centrifuge/go-substrate-rpc-client/v4/signature"
 	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/03-connection/types"
 	types23 "github.com/cosmos/ibc-go/v7/modules/core/23-commitment/types"
-	"github.com/misko9/go-substrate-rpc-client/v4/signature"
 	"github.com/pelletier/go-toml/v2"
 	"github.com/strangelove-ventures/interchaintest/v7/chain/polkadot"
 	"github.com/strangelove-ventures/interchaintest/v7/ibc"
@@ -30,7 +30,7 @@ type pathConfiguration struct {
 
 // pathChainConfig holds all values that will be required when interacting with a path.
 type pathChainConfig struct {
-	chainID      string
+	chainID string
 }
 
 func (hyperspaceCommander) Name() string {

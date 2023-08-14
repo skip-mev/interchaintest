@@ -50,7 +50,7 @@ type CosmosChain struct {
 	numFullNodes  int
 	Validators    ChainNodes
 	FullNodes     ChainNodes
-
+	preStartNodes func(c *CosmosChain)
 	// Additional processes that need to be run on a per-chain basis.
 	Sidecars SidecarProcesses
 
@@ -105,6 +105,10 @@ func NewCosmosChain(testName string, chainConfig ibc.ChainConfig, numValidators 
 		log:           log,
 		keyring:       kr,
 	}
+}
+
+func (c *CosmosChain) WithPrestartNodes(f func(c *CosmosChain)) {
+	c.preStartNodes = f
 }
 
 // Nodes returns all nodes, including validators and fullnodes.
@@ -811,12 +815,12 @@ func (c *CosmosChain) Start(testName string, ctx context.Context, additionalGene
 	chainCfg := c.Config()
 
 	genesisAmount := types.Coin{
-		Amount: types.NewInt(10_000_000_000_000),
+		Amount: math.NewInt(10_000_000_000_000),
 		Denom:  chainCfg.Denom,
 	}
 
 	genesisSelfDelegation := types.Coin{
-		Amount: types.NewInt(5_000_000_000_000),
+		Amount: math.NewInt(5_000_000_000_000),
 		Denom:  chainCfg.Denom,
 	}
 
@@ -827,6 +831,10 @@ func (c *CosmosChain) Start(testName string, ctx context.Context, additionalGene
 	genesisAmounts := []types.Coin{genesisAmount}
 
 	configFileOverrides := chainCfg.ConfigFileOverrides
+
+	if c.preStartNodes != nil {
+		c.preStartNodes(c)
+	}
 
 	eg := new(errgroup.Group)
 	// Initialize config and sign gentx for each validator.

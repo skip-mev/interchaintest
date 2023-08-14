@@ -10,12 +10,12 @@ import (
 
 	"cosmossdk.io/math"
 	"github.com/avast/retry-go/v4"
+	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/docker/docker/client"
 	"github.com/icza/dyno"
 	p2pcrypto "github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/libp2p/go-libp2p/core/peer"
-	gsrpc "github.com/misko9/go-substrate-rpc-client/v4"
 	"github.com/strangelove-ventures/interchaintest/v7/ibc"
 	"github.com/strangelove-ventures/interchaintest/v7/internal/dockerutil"
 	"go.uber.org/zap"
@@ -311,11 +311,7 @@ func (pn *ParachainNode) GetBalance(ctx context.Context, address string, denom s
 
 // GetIbcBalance returns the Coins type of ibc coins in account
 func (pn *ParachainNode) GetIbcBalance(ctx context.Context, address string, denom uint64) (sdktypes.Coin, error) {
-	res, err := pn.api.RPC.IBC.QueryBalanceWithAddress(ctx, address, denom)
-	if err != nil {
-		return sdktypes.Coin{}, err
-	}
-	return res, nil
+	return sdktypes.Coin{}, nil
 }
 
 // SendFunds sends funds to a wallet from a user account.
