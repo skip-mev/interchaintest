@@ -832,10 +832,6 @@ func (c *CosmosChain) Start(testName string, ctx context.Context, additionalGene
 
 	configFileOverrides := chainCfg.ConfigFileOverrides
 
-	if c.preStartNodes != nil {
-		c.preStartNodes(c)
-	}
-
 	eg := new(errgroup.Group)
 	// Initialize config and sign gentx for each validator.
 	for _, v := range c.Validators {
@@ -901,6 +897,10 @@ func (c *CosmosChain) Start(testName string, ctx context.Context, additionalGene
 	// wait for this to finish
 	if err := eg.Wait(); err != nil {
 		return err
+	}
+
+	if c.preStartNodes != nil {
+		c.preStartNodes(c)
 	}
 
 	if c.cfg.PreGenesis != nil {

@@ -197,6 +197,10 @@ func (tn *ChainNode) ContainerID() string {
 	return tn.containerLifecycle.ContainerID()
 }
 
+func (tn *ChainNode) WithPrestartNode(f func(n *ChainNode)) {
+	tn.preStartNode = f
+}
+
 // hostname of the test node container
 func (tn *ChainNode) HostName() string {
 	return dockerutil.CondenseHostName(tn.Name())
