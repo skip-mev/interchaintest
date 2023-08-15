@@ -1,4 +1,4 @@
-module github.com/strangelove-ventures/interchaintest/v7
+module github.com/skip-mev/interchaintest/v7
 
 go 1.19
 
@@ -25,6 +25,7 @@ require (
 	github.com/pelletier/go-toml v1.2.0
 	github.com/rivo/tview v0.0.0-20230814110005-ccc2c8119703
 	github.com/spf13/cobra v1.7.0
+	github.com/strangelove-ventures/interchaintest/v7 v7.0.0-00010101000000-000000000000
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/multierr v1.10.0
 	go.uber.org/zap v1.24.0
@@ -219,3 +220,5 @@ require (
 )
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+
+replace github.com/strangelove-ventures/interchaintest/v7 => ./
