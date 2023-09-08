@@ -38,7 +38,6 @@ type BuiltinChainFactory struct {
 	specs []*ChainSpec
 }
 
-//go:embed configuredChains.yaml
 var embeddedConfiguredChains []byte
 
 var logConfiguredChainsSourceOnce sync.Once
