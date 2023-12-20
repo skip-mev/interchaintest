@@ -51,7 +51,7 @@ type CosmosChain struct {
 	numFullNodes  int
 	Validators    ChainNodes
 	FullNodes     ChainNodes
-
+	preStartNodes func(c *CosmosChain)
 	// Additional processes that need to be run on a per-chain basis.
 	Sidecars SidecarProcesses
 
@@ -106,6 +106,10 @@ func NewCosmosChain(testName string, chainConfig ibc.ChainConfig, numValidators 
 		log:           log,
 		keyring:       kr,
 	}
+}
+
+func (c *CosmosChain) WithPrestartNodes(f func(c *CosmosChain)) {
+	c.preStartNodes = f
 }
 
 // Nodes returns all nodes, including validators and fullnodes.
@@ -939,6 +943,10 @@ func (c *CosmosChain) Start(testName string, ctx context.Context, additionalGene
 	// wait for this to finish
 	if err := eg.Wait(); err != nil {
 		return err
+	}
+
+	if c.preStartNodes != nil {
+		c.preStartNodes(c)
 	}
 
 	if c.cfg.PreGenesis != nil {

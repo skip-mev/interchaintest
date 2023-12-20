@@ -52,6 +52,7 @@ type ChainNode struct {
 	Client       rpcclient.Client
 	TestName     string
 	Image        ibc.DockerImage
+	preStartNode func(n *ChainNode)
 
 	// Additional processes that need to be run on a per-validator basis.
 	Sidecars SidecarProcesses
@@ -196,6 +197,10 @@ func (tn *ChainNode) Name() string {
 
 func (tn *ChainNode) ContainerID() string {
 	return tn.containerLifecycle.ContainerID()
+}
+
+func (tn *ChainNode) WithPrestartNode(f func(n *ChainNode)) {
+	tn.preStartNode = f
 }
 
 // hostname of the test node container
@@ -1307,6 +1312,10 @@ func (tn *ChainNode) StartContainer(ctx context.Context) error {
 				return err
 			}
 		}
+	}
+
+	if tn.preStartNode != nil {
+		tn.preStartNode(tn)
 	}
 
 	if err := tn.containerLifecycle.StartContainer(ctx); err != nil {
