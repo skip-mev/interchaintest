@@ -1,6 +1,7 @@
 package cosmos
 
 import (
+	"cosmossdk.io/x/upgrade"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -8,7 +9,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authTx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/ibc-go/modules/capability"
 	"github.com/cosmos/cosmos-sdk/x/consensus"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
@@ -20,12 +20,12 @@ import (
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
-	"cosmossdk.io/x/upgrade"
+	"github.com/cosmos/ibc-go/modules/capability"
 
-	transfer "github.com/cosmos/ibc-go/v7/modules/apps/transfer"
-	ibccore "github.com/cosmos/ibc-go/v7/modules/core"
-	ibctm "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
-	ibcwasm "github.com/strangelove-ventures/interchaintest/v7/chain/cosmos/08-wasm-types"
+	transfer "github.com/cosmos/ibc-go/v8/modules/apps/transfer"
+	ibccore "github.com/cosmos/ibc-go/v8/modules/core"
+	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
+	ibcwasm "github.com/strangelove-ventures/interchaintest/v8/chain/cosmos/08-wasm-types"
 )
 
 func DefaultEncoding() testutil.TestEncodingConfig {

@@ -12,8 +12,9 @@ import (
 	dockerclient "github.com/docker/docker/client"
 	"github.com/docker/docker/errdefs"
 	"github.com/docker/go-connections/nat"
-	"github.com/strangelove-ventures/interchaintest/v7/ibc"
 	"go.uber.org/zap"
+
+	"github.com/strangelove-ventures/interchaintest/v8/ibc"
 )
 
 type ContainerLifecycle struct {
@@ -41,6 +42,7 @@ func (c *ContainerLifecycle) CreateContainer(
 	volumeBinds []string,
 	hostName string,
 	cmd []string,
+	env []string,
 ) error {
 	imageRef := image.Ref()
 	c.log.Info(
@@ -63,6 +65,7 @@ func (c *ContainerLifecycle) CreateContainer(
 			Image: imageRef,
 
 			Entrypoint: []string{},
+			Env:        env,
 			Cmd:        cmd,
 
 			Hostname: hostName,
@@ -111,6 +114,14 @@ func (c *ContainerLifecycle) StartContainer(ctx context.Context) error {
 	c.log.Info("Container started", zap.String("container", c.containerName))
 
 	return nil
+}
+
+func (c *ContainerLifecycle) PauseContainer(ctx context.Context) error {
+	return c.client.ContainerPause(ctx, c.id)
+}
+
+func (c *ContainerLifecycle) UnpauseContainer(ctx context.Context) error {
+	return c.client.ContainerUnpause(ctx, c.id)
 }
 
 func (c *ContainerLifecycle) StopContainer(ctx context.Context) error {

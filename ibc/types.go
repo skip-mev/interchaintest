@@ -1,13 +1,15 @@
 package ibc
 
 import (
+	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"cosmossdk.io/math"
-	"github.com/cosmos/cosmos-sdk/types/module/testutil"
-	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/03-connection/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/module/testutil"
+	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
 )
 
 // ChainConfig defines the chain parameters requires to run an interchaintest testnet for a chain.
@@ -48,12 +50,12 @@ type ChainConfig struct {
 	ConfigFileOverrides map[string]any
 	// Non-nil will override the encoding config, used for cosmos chains only.
 	EncodingConfig *testutil.TestEncodingConfig
-	// Required when the chain uses the new sub commands for genesis (https://github.com/cosmos/cosmos-sdk/pull/14149)
-	UsingNewGenesisCommand bool `yaml:"using-new-genesis-command"`
 	// Required when the chain requires the chain-id field to be populated for certain commands
 	UsingChainIDFlagCLI bool `yaml:"using-chain-id-flag-cli"`
 	// Configuration describing additional sidecar processes.
 	SidecarConfigs []SidecarConfig
+	// CoinDecimals for the chains base micro/nano/atto token configuration.
+	CoinDecimals *int64
 }
 
 func (c ChainConfig) Clone() ChainConfig {
@@ -66,6 +68,11 @@ func (c ChainConfig) Clone() ChainConfig {
 	sidecars := make([]SidecarConfig, len(c.SidecarConfigs))
 	copy(sidecars, c.SidecarConfigs)
 	x.SidecarConfigs = sidecars
+
+	if c.CoinDecimals != nil {
+		coinDecimals := *c.CoinDecimals
+		x.CoinDecimals = &coinDecimals
+	}
 
 	return x
 }
@@ -164,6 +171,10 @@ func (c ChainConfig) MergeChainSpecConfig(other ChainConfig) ChainConfig {
 		c.SidecarConfigs = append([]SidecarConfig(nil), other.SidecarConfigs...)
 	}
 
+	if other.CoinDecimals != nil {
+		c.CoinDecimals = other.CoinDecimals
+	}
+
 	return c
 }
 
@@ -171,6 +182,12 @@ func (c ChainConfig) MergeChainSpecConfig(other ChainConfig) ChainConfig {
 // It is possible for some fields, such as GasAdjustment and NoHostMount,
 // to be their respective zero values and for IsFullyConfigured to still report true.
 func (c ChainConfig) IsFullyConfigured() bool {
+	for _, image := range c.Images {
+		if !image.IsFullyConfigured() {
+			return false
+		}
+	}
+
 	return c.Type != "" &&
 		c.Name != "" &&
 		c.ChainID != "" &&
@@ -197,6 +214,41 @@ type DockerImage struct {
 	Repository string `yaml:"repository"`
 	Version    string `yaml:"version"`
 	UidGid     string `yaml:"uid-gid"`
+}
+
+func NewDockerImage(repository, version, uidGid string) DockerImage {
+	return DockerImage{
+		Repository: repository,
+		Version:    version,
+		UidGid:     uidGid,
+	}
+}
+
+// IsFullyConfigured reports whether all of i's required fields are present.
+// Version is not required, as it can be superseded by a ChainSpec version.
+func (i DockerImage) IsFullyConfigured() bool {
+	return i.Validate() == nil
+}
+
+// Validate returns an error describing which of i's required fields are missing
+// and returns nil if all required fields are present. Version is not required,
+// as it can be superseded by a ChainSpec version.
+func (i DockerImage) Validate() error {
+	var missing []string
+
+	if i.Repository == "" {
+		missing = append(missing, "Repository")
+	}
+	if i.UidGid == "" {
+		missing = append(missing, "UidGid")
+	}
+
+	if len(missing) > 0 {
+		fields := strings.Join(missing, ", ")
+		return fmt.Errorf("DockerImage is missing fields: %s", fields)
+	}
+
+	return nil
 }
 
 // Ref returns the reference to use when e.g. creating a container.

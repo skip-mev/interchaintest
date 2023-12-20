@@ -7,9 +7,10 @@ import (
 
 	dockerclient "github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
-	"github.com/strangelove-ventures/interchaintest/v7/ibc"
-	"github.com/strangelove-ventures/interchaintest/v7/internal/dockerutil"
 	"go.uber.org/zap"
+
+	"github.com/strangelove-ventures/interchaintest/v8/ibc"
+	"github.com/strangelove-ventures/interchaintest/v8/internal/dockerutil"
 )
 
 type SidecarProcesses []*SidecarProcess
@@ -103,11 +104,19 @@ func (s *SidecarProcess) logger() *zap.Logger {
 }
 
 func (s *SidecarProcess) CreateContainer(ctx context.Context) error {
-	return s.containerLifecycle.CreateContainer(ctx, s.TestName, s.NetworkID, s.Image, s.ports, s.Bind(), s.HostName(), s.startCmd)
+	return s.containerLifecycle.CreateContainer(ctx, s.TestName, s.NetworkID, s.Image, s.ports, s.Bind(), s.HostName(), s.startCmd, nil)
 }
 
 func (s *SidecarProcess) StartContainer(ctx context.Context) error {
 	return s.containerLifecycle.StartContainer(ctx)
+}
+
+func (s *SidecarProcess) PauseContainer(ctx context.Context) error {
+	return s.containerLifecycle.PauseContainer(ctx)
+}
+
+func (s *SidecarProcess) UnpauseContainer(ctx context.Context) error {
+	return s.containerLifecycle.UnpauseContainer(ctx)
 }
 
 func (s *SidecarProcess) StopContainer(ctx context.Context) error {
