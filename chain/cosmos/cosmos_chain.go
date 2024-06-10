@@ -128,7 +128,6 @@ func (c *CosmosChain) WithPreStartNodes(preStartNodes func(*CosmosChain)) {
 	c.preStartNodes = preStartNodes
 }
 
-
 // GetCodec returns the codec for the chain.
 func (c *CosmosChain) GetCodec() *codec.ProtoCodec {
 	return c.cdc
@@ -840,7 +839,7 @@ func (c *CosmosChain) Start(testName string, ctx context.Context, additionalGene
 	genesisSelfDelegation := make([]types.Coin, len(c.Validators))
 
 	for i := range c.Validators {
-		genesisAmounts[i] = []types.Coin{{Amount: sdkmath.NewInt(10_000_000).MulRaw(decimalPow), Denom: chainCfg.Denom}}
+		genesisAmounts[i] = []types.Coin{{Amount: sdkmath.NewInt(10_000_000).MulRaw(decimalPow), Denom: "untrn"}, {Amount: sdkmath.NewInt(10_000_000).MulRaw(decimalPow), Denom: chainCfg.Denom}}
 		genesisSelfDelegation[i] = types.Coin{Amount: sdkmath.NewInt(5_000_000).MulRaw(decimalPow), Denom: chainCfg.Denom}
 		if chainCfg.ModifyGenesisAmounts != nil {
 			amount, selfDelegation := chainCfg.ModifyGenesisAmounts(i)
@@ -954,7 +953,7 @@ func (c *CosmosChain) Start(testName string, ctx context.Context, additionalGene
 
 	for _, wallet := range additionalGenesisWallets {
 
-		if err := validator0.AddGenesisAccount(ctx, wallet.Address, []types.Coin{{Denom: wallet.Denom, Amount: wallet.Amount}}); err != nil {
+		if err := validator0.AddGenesisAccount(ctx, wallet.Address, []types.Coin{{Amount: sdkmath.NewInt(10_000_000).MulRaw(decimalPow), Denom: "untrn"}, {Denom: wallet.Denom, Amount: wallet.Amount}}); err != nil {
 			return err
 		}
 	}
