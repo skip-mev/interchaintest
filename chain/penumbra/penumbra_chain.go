@@ -341,7 +341,7 @@ type ValidatorWithIntPower struct {
 	PubKeyBase64 string
 }
 
-func (c *PenumbraChain) Start(testName string, ctx context.Context, additionalGenesisWallets ...ibc.WalletAmount) error {
+func (c *PenumbraChain) Start(testName string, ctx context.Context, _ []string, additionalGenesisWallets ...ibc.WalletAmount) error {
 	validators := c.PenumbraNodes[:c.numValidators]
 	fullnodes := c.PenumbraNodes[c.numValidators:]
 

@@ -6,6 +6,7 @@ import (
 	crand "crypto/rand"
 	"encoding/json"
 	"fmt"
+	"github.com/icza/dyno"
 	"io"
 	"strings"
 
@@ -18,7 +19,6 @@ import (
 	volumetypes "github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
 	dockerclient "github.com/docker/docker/client"
-	"github.com/icza/dyno"
 	p2pcrypto "github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/misko9/go-substrate-rpc-client/v4/signature"
 	gstypes "github.com/misko9/go-substrate-rpc-client/v4/types"
@@ -416,7 +416,7 @@ func (c *PolkadotChain) logger() *zap.Logger {
 
 // Start sets up everything needed (validators, gentx, fullnodes, peering, additional accounts) for chain to start from genesis.
 // Implements Chain interface.
-func (c *PolkadotChain) Start(testName string, ctx context.Context, additionalGenesisWallets ...ibc.WalletAmount) error {
+func (c *PolkadotChain) Start(testName string, ctx context.Context, _ []string, additionalGenesisWallets ...ibc.WalletAmount) error {
 	var eg errgroup.Group
 	// Generate genesis file for each set of parachains
 	for _, parachainNodes := range c.ParachainNodes {

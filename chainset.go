@@ -105,6 +105,8 @@ func (cs *chainSet) CreateCommonAccount(ctx context.Context, keyName string) (fa
 func (cs *chainSet) Start(ctx context.Context, testName string, additionalGenesisWallets map[ibc.Chain][]ibc.WalletAmount) error {
 	eg, egCtx := errgroup.WithContext(ctx)
 
+	extraDenoms := []string{}
+
 	for c := range cs.chains {
 		c := c
 		if cosmosChain, ok := c.(*cosmos.CosmosChain); ok && cosmosChain.Provider != nil {
@@ -115,8 +117,14 @@ func (cs *chainSet) Start(ctx context.Context, testName string, additionalGenesi
 			chainCfg := c.Config()
 			if cosmosChain, ok := c.(*cosmos.CosmosChain); ok {
 				if len(cosmosChain.Consumers) > 0 {
+
+					for _, consumer := range cosmosChain.Consumers {
+						cfg := consumer.Config()
+						extraDenoms = append(extraDenoms, cfg.Denom)
+					}
+
 					// this is a provider chain
-					if err := cosmosChain.StartProvider(testName, egCtx, additionalGenesisWallets[c]...); err != nil {
+					if err := cosmosChain.StartProvider(testName, egCtx, extraDenoms, additionalGenesisWallets[c]...); err != nil {
 						return fmt.Errorf("failed to start provider chain %s: %w", chainCfg.Name, err)
 					}
 					return nil
@@ -124,7 +132,7 @@ func (cs *chainSet) Start(ctx context.Context, testName string, additionalGenesi
 			}
 
 			// standard chain startup
-			if err := c.Start(testName, egCtx, additionalGenesisWallets[c]...); err != nil {
+			if err := c.Start(testName, egCtx, extraDenoms, additionalGenesisWallets[c]...); err != nil {
 				return fmt.Errorf("failed to start chain %s: %w", chainCfg.Name, err)
 			}
 

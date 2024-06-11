@@ -830,7 +830,7 @@ type ValidatorWithIntPower struct {
 }
 
 // Bootstraps the chain and starts it from genesis
-func (c *CosmosChain) Start(testName string, ctx context.Context, additionalGenesisWallets ...ibc.WalletAmount) error {
+func (c *CosmosChain) Start(testName string, ctx context.Context, additionalDenoms []string, additionalGenesisWallets ...ibc.WalletAmount) error {
 	chainCfg := c.Config()
 
 	decimalPow := int64(math.Pow10(int(*chainCfg.CoinDecimals)))
@@ -838,8 +838,13 @@ func (c *CosmosChain) Start(testName string, ctx context.Context, additionalGene
 	genesisAmounts := make([][]types.Coin, len(c.Validators))
 	genesisSelfDelegation := make([]types.Coin, len(c.Validators))
 
+	coins := types.NewCoins(types.Coin{Amount: sdkmath.NewInt(10_000_000).MulRaw(decimalPow), Denom: chainCfg.Denom})
+	for _, denom := range additionalDenoms {
+		coins = coins.Add(types.Coin{Amount: sdkmath.NewInt(10_000_000).MulRaw(decimalPow), Denom: denom})
+	}
+
 	for i := range c.Validators {
-		genesisAmounts[i] = []types.Coin{{Amount: sdkmath.NewInt(10_000_000).MulRaw(decimalPow), Denom: "untrn"}, {Amount: sdkmath.NewInt(10_000_000).MulRaw(decimalPow), Denom: chainCfg.Denom}}
+		genesisAmounts[i] = coins
 		genesisSelfDelegation[i] = types.Coin{Amount: sdkmath.NewInt(5_000_000).MulRaw(decimalPow), Denom: chainCfg.Denom}
 		if chainCfg.ModifyGenesisAmounts != nil {
 			amount, selfDelegation := chainCfg.ModifyGenesisAmounts(i)

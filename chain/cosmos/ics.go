@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/icza/dyno"
 	"os"
 	"path"
 	"strconv"
@@ -15,7 +16,6 @@ import (
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	clienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types" // nolint:staticcheck
 	ccvclient "github.com/cosmos/interchain-security/v5/x/ccv/provider/client"
-	"github.com/icza/dyno"
 	"github.com/strangelove-ventures/interchaintest/v8/dockerutil"
 	"github.com/strangelove-ventures/interchaintest/v8/ibc"
 	"github.com/strangelove-ventures/interchaintest/v8/testreporter"
@@ -94,8 +94,8 @@ func (c *CosmosChain) FlushPendingICSPackets(ctx context.Context, r ibc.Relayer,
 	return r.Flush(ctx, eRep, ibcPath, ICSChannel)
 }
 
-// Bootstraps the provider chain and starts it from genesis
-func (c *CosmosChain) StartProvider(testName string, ctx context.Context, additionalGenesisWallets ...ibc.WalletAmount) error {
+// StartProvider bootstraps the provider chain and starts it from genesis
+func (c *CosmosChain) StartProvider(testName string, ctx context.Context, additionalDenoms []string, additionalGenesisWallets ...ibc.WalletAmount) error {
 	existingFunc := c.cfg.ModifyGenesis
 	c.cfg.ModifyGenesis = func(cc ibc.ChainConfig, b []byte) ([]byte, error) {
 		var err error
@@ -131,7 +131,7 @@ func (c *CosmosChain) StartProvider(testName string, ctx context.Context, additi
 
 	additionalGenesisWallets = append(additionalGenesisWallets, proposer)
 
-	if err := c.Start(testName, ctx, additionalGenesisWallets...); err != nil {
+	if err := c.Start(testName, ctx, additionalDenoms, additionalGenesisWallets...); err != nil {
 		return err
 	}
 

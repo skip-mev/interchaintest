@@ -15,7 +15,7 @@ type Chain interface {
 	Initialize(ctx context.Context, testName string, cli *client.Client, networkID string) error
 
 	// Start sets up everything needed (validators, gentx, fullnodes, peering, additional accounts) for chain to start from genesis.
-	Start(testName string, ctx context.Context, additionalGenesisWallets ...WalletAmount) error
+	Start(testName string, ctx context.Context, additionalDenoms []string, additionalGenesisWallets ...WalletAmount) error
 
 	// Exec runs an arbitrary command using Chain's docker environment.
 	// Whether the invoked command is run in a one-off container or execing into an already running container
